@@ -9,7 +9,10 @@ const userResolvers = {
       }
       return await User.find();
     },
-    getUser: async (_, { id }) => {
+    getUser: async (_, { id }, { userId }) => {
+      if (!userId) {
+        throw new Error("Not authenticated");
+      }
       return await User.findById(id);
     },
   },
