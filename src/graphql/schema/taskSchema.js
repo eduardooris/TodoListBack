@@ -1,23 +1,33 @@
-const { gql } = require('apollo-server-express');
+const { gql } = require("apollo-server-express");
 
 const taskSchema = gql`
-    type Task {
-        id: ID!
-        userId: ID!
-        title: String!
-        completed: Boolean!
-    }
+  type Task {
+    id: ID!
+    isn_usuario: ID!
+    title: String!
+    completed: Boolean!
+    comments: [Comment]
+  }
 
-    extend type Query {
-        getTasks: [Task]
-        getTask(id: ID!): Task
-    }
+  type Comment {
+    id: ID!
+    isn_usuario: ID!
+    comment: String!
+    dsc_annex: String
+    date: String!
+  }
 
-    extend type Mutation {
-        addTask(id: ID!, title: String!): Task
-        updateTask(id: ID!, completed: Boolean!): Task
-        deleteTask(id: ID!): Boolean
-    }
+  extend type Query {
+    getTasks: [Task]
+    getTask(id: ID!): Task
+  }
+
+  extend type Mutation {
+    addTask(isn_usuario: ID!, title: String!): Task
+    updateTask(id: ID!, completed: Boolean!): Task
+    deleteTask(id: ID!): Boolean
+    addComment(id: ID!, isn_usuario: ID!, comment: String!): Task
+  }
 `;
 
 module.exports = taskSchema;

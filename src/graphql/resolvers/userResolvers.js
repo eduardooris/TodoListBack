@@ -3,17 +3,17 @@ const userService = require("../../services/userService");
 
 const userResolvers = {
   Query: {
-    getUsers: async (_, { id }, { userId }) => {
+    getUsers: async (_, {}, { userId }) => {
       if (!userId) {
         throw new Error("Not authenticated");
       }
-      return await User.find();
+      return await userService.getUsers();
     },
     getUser: async (_, { id }, { userId }) => {
       if (!userId) {
         throw new Error("Not authenticated");
       }
-      return await User.findById(id);
+      return await userService.getUser(id);
     },
   },
   Mutation: {

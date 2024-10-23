@@ -17,6 +17,12 @@ const userService = {
 
     return generateToken(user._id);
   },
+  getUser: async (id) => {
+    return await User.findById(id);
+  },
+  getUsers: async () => {
+    return await User.find();
+  },
 };
 
 module.exports = userService;

@@ -8,7 +8,7 @@ const taskService = {
     return await Task.findById(id);
   },
   addTask: async (title, id) => {
-    const task = new Task({ title, userId: id });
+    const task = new Task({ title, isn_usuario: id });
     return await task.save();
   },
   updateTask: async (id, completed) => {
@@ -17,6 +17,11 @@ const taskService = {
   deleteTask: async (id) => {
     await Task.findByIdAndDelete(id);
     return true;
+  },
+  addComment: async (taskId, isn_usuario, comment) => {
+    const task = await Task.findById(taskId);
+    task.comments.push({ isn_usuario, comment });
+    return await task.save();
   },
 };
 

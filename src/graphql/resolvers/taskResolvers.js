@@ -4,9 +4,9 @@ const { emitEvent } = require("../../sockets/socketEvents/eventEmitter");
 const taskResolvers = {
   Query: {
     getTasks: async (_, {}, { userId }) => {
-        if (!userId) {
-          throw new Error("Not authenticated");
-        }
+      if (!userId) {
+        throw new Error("Not authenticated");
+      }
       return await taskService.getTasks();
     },
     getTask: async (_, { id }, { userId }) => {
@@ -17,12 +17,12 @@ const taskResolvers = {
     },
   },
   Mutation: {
-    addTask: async (_, { title, id }, { userId }) => {
+    addTask: async (_, { title, isn_usuario }, { userId }) => {
       if (!userId) {
         throw new Error("Not authenticated");
       }
 
-      const task = await taskService.addTask(title, id);
+      const task = await taskService.addTask(title, isn_usuario);
 
       const taskAdded = {
         title: task.title,
@@ -62,6 +62,12 @@ const taskResolvers = {
       emitEvent("taskDeleted", taskDeleted, userId);
 
       return task;
+    },
+    addComment: async (_, { id, isn_usuario, comment }, { userId }) => {
+      if (!userId) {
+        throw new Error("Not authenticated");
+      }
+      return await taskService.addComment(id, isn_usuario, comment);
     },
   },
 };
