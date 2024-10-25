@@ -13,6 +13,6 @@ const authMiddleware = async ({ req }) => {
     }
   }
 
-  return { userId };
+  return { token: userId };
 };
 module.exports = authMiddleware;

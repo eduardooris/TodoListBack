@@ -1,27 +1,100 @@
 const Task = require("../models/Task");
+const {
+  setCache,
+  getCache,
+  deleteCache,
+  clearUserTasksCache,
+} = require("../cache/taskCache");
+const {taskCacheKeys} = require("../utils/cacheKeys");
+const { formatDate } = require("../utils/formatDate");
 
 const taskService = {
-  getTasks: async () => {
-    return await Task.find();
+  getAllTasks: async () => {
+    return Task.find();
   },
+
+  getTasks: async (isn_usuario) => {
+    const cacheKey = taskCacheKeys.userTasks(isn_usuario);
+    let tasks = getCache(cacheKey);
+
+    if (!tasks) {
+      tasks = await Task.find({ isn_usuario });
+      setCache(cacheKey, tasks);
+    }
+
+    return tasks;
+  },
+
   getTask: async (id) => {
-    return await Task.findById(id);
+    const cacheKey = taskCacheKeys.taskById(id);
+    let task = getCache(cacheKey);
+
+    if (!task) {
+      task = await Task.findById(id);
+      if (task) setCache(cacheKey, task);
+    }
+
+    return task;
   },
-  addTask: async (title, id) => {
-    const task = new Task({ title, isn_usuario: id });
-    return await task.save();
+
+  addTask: async (title, isn_usuario) => {
+    const task = new Task({ title, isn_usuario });
+    await task.save();
+
+    clearUserTasksCache(isn_usuario);
+    deleteCache(taskCacheKeys.allTasks);
+
+    return task;
   },
+
   updateTask: async (id, completed) => {
-    return await Task.findByIdAndUpdate(id, { completed }, { new: true });
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      { completed },
+      { new: true }
+    );
+
+    if (updatedTask) {
+      setCache(taskCacheKeys.taskById(id), updatedTask);
+      clearUserTasksCache(updatedTask.isn_usuario);
+    }
+
+    return updatedTask;
   },
+
   deleteTask: async (id) => {
-    await Task.findByIdAndDelete(id);
-    return true;
+    const task = await Task.findByIdAndDelete(id);
+    if (task) {
+      deleteCache(taskCacheKeys.taskById(id));
+      clearUserTasksCache(task.isn_usuario);
+    }
+    return !!task;
   },
+
   addComment: async (taskId, isn_usuario, comment) => {
     const task = await Task.findById(taskId);
-    task.comments.push({ isn_usuario, comment });
-    return await task.save();
+    if (!task) return null;
+
+    task.comments.push({
+      isn_usuario,
+      comment,
+      date: formatDate(),
+    });
+
+    await task.save();
+
+    setCache(taskCacheKeys.taskById(taskId), task);
+    return task;
+  },
+
+  deleteComment: async (taskId, commentId) => {
+    const task = await Task.findById(taskId);
+    if (!task) return null;
+
+    task.comments = task.comments.filter((comment) => comment.id !== commentId);
+    await task.save();
+    setCache(taskCacheKeys.taskById(taskId), task);
+    return task;
   },
 };
 

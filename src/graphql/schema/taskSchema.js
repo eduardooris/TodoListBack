@@ -18,7 +18,8 @@ const taskSchema = gql`
   }
 
   extend type Query {
-    getTasks: [Task]
+    getAllTasks: [Task]
+    getTasks(isn_usuario: ID!): [Task]
     getTask(id: ID!): Task
   }
 
@@ -27,6 +28,7 @@ const taskSchema = gql`
     updateTask(id: ID!, completed: Boolean!): Task
     deleteTask(id: ID!): Boolean
     addComment(id: ID!, isn_usuario: ID!, comment: String!): Task
+    deleteComment(id: ID!, commentId: ID!): Task
   }
 `;
 

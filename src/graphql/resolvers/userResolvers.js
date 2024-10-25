@@ -3,14 +3,14 @@ const userService = require("../../services/userService");
 
 const userResolvers = {
   Query: {
-    getUsers: async (_, {}, { userId }) => {
-      if (!userId) {
+    getUsers: async (_, {}, { token }) => {
+      if (!token) {
         throw new Error("Not authenticated");
       }
       return await userService.getUsers();
     },
-    getUser: async (_, { id }, { userId }) => {
-      if (!userId) {
+    getUser: async (_, { id }, { token }) => {
+      if (!token) {
         throw new Error("Not authenticated");
       }
       return await userService.getUser(id);
