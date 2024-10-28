@@ -4,6 +4,10 @@ const taskSchema = gql`
   type Task {
     id: ID!
     isn_usuario: ID!
+    description: String
+    date: String!
+    date_created: String
+    date_updated: String
     title: String!
     completed: Boolean!
     comments: [Comment]
@@ -13,6 +17,7 @@ const taskSchema = gql`
     id: ID!
     isn_usuario: ID!
     comment: String!
+    date_created: String
     dsc_annex: String
     date: String!
   }
@@ -24,7 +29,12 @@ const taskSchema = gql`
   }
 
   extend type Mutation {
-    addTask(isn_usuario: ID!, title: String!): Task
+    addTask(
+      isn_usuario: ID!
+      title: String!
+      description: String
+      date: String
+    ): Task
     updateTask(id: ID!, completed: Boolean!): Task
     deleteTask(id: ID!): Boolean
     addComment(id: ID!, isn_usuario: ID!, comment: String!): Task

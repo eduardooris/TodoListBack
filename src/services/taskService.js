@@ -5,8 +5,8 @@ const {
   deleteCache,
   clearUserTasksCache,
 } = require("../cache/taskCache");
-const {taskCacheKeys} = require("../utils/cacheKeys");
-const { formatDate } = require("../utils/formatDate");
+const { taskCacheKeys } = require("../utils/cacheKeys");
+const { formatDate, generateDate } = require("../utils/formatDate");
 
 const taskService = {
   getAllTasks: async () => {
@@ -37,20 +37,25 @@ const taskService = {
     return task;
   },
 
-  addTask: async (title, isn_usuario) => {
-    const task = new Task({ title, isn_usuario });
+  addTask: async ({ title, description, isn_usuario, date }) => {
+    const task = new Task({
+      title,
+      description,
+      isn_usuario,
+      date: formatDate(date),
+      date_created: generateDate(),
+    });
     await task.save();
 
     clearUserTasksCache(isn_usuario);
     deleteCache(taskCacheKeys.allTasks);
-
     return task;
   },
 
-  updateTask: async (id, completed) => {
+  updateTask: async ({ id, completed }) => {
     const updatedTask = await Task.findByIdAndUpdate(
       id,
-      { completed },
+      { completed, date_updated: generateDate() },
       { new: true }
     );
 
@@ -78,7 +83,7 @@ const taskService = {
     task.comments.push({
       isn_usuario,
       comment,
-      date: formatDate(),
+      date_created: generateDate(),
     });
 
     await task.save();

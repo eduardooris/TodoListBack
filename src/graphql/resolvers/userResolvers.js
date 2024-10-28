@@ -3,26 +3,31 @@ const userService = require("../../services/userService");
 
 const userResolvers = {
   Query: {
-    getUsers: async (_, {}, { token }) => {
+    getUsers: async (_, { isn_usuario }, { token }) => {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await userService.getUsers();
+
+      console.log("isn_usuario", isn_usuario);
+      return userService.getUsers({ isn_usuario });
     },
     getUser: async (_, { id }, { token }) => {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await userService.getUser(id);
+      return userService.getUser(id);
     },
   },
   Mutation: {
     register: async (_, { username, email, password }) => {
-      return await userService.register(username, email, password);
+      return userService.register({ username, email, password });
     },
     login: async (_, { email, password }) => {
-      return await userService.login(email, password);
+      return userService.login(email, password);
     },
+    getAppInit: async (_, { token }) => {
+      return userService.getAppInit({token});
+    }
   },
 };
 

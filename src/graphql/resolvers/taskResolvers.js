@@ -7,36 +7,38 @@ const taskResolvers = {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await taskService.getTasks(isn_usuario);
+      return taskService.getTasks(isn_usuario);
     },
     getAllTasks: async (_, {}, { token }) => {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await taskService.getAllTasks();
+      return taskService.getAllTasks();
     },
     getTask: async (_, { id }, { token }) => {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await taskService.getTask(id);
+      return taskService.getTask(id);
     },
   },
   Mutation: {
-    addTask: async (_, { title, isn_usuario }, { token }) => {
+    addTask: async (
+      _,
+      { title, description, isn_usuario, date },
+      { token }
+    ) => {
       if (!token) {
         throw new Error("Not authenticated");
       }
+      const task = await taskService.addTask({
+        title,
+        description,
+        isn_usuario,
+        date,
+      });
 
-      const task = await taskService.addTask(title, isn_usuario);
-
-      const taskAdded = {
-        title: task.title,
-        completed: task.completed,
-        id: task.id,
-      };
-
-      emitEvent("taskAdded", taskAdded, task.token);
+      emitEvent("taskAdded", task.id, task.isn_usuario);
 
       return task;
     },
@@ -44,7 +46,7 @@ const taskResolvers = {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      const task = await taskService.updateTask(id, completed);
+      const task = await taskService.updateTask({ id, completed });
 
       const taskUpdated = {
         title: task.title,
@@ -73,13 +75,13 @@ const taskResolvers = {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await taskService.addComment(id, isn_usuario, comment);
+      return taskService.addComment(id, isn_usuario, comment);
     },
     deleteComment: async (_, { id, commentId }, { token }) => {
       if (!token) {
         throw new Error("Not authenticated");
       }
-      return await taskService.deleteComment(id, commentId);
+      return taskService.deleteComment(id, commentId);
     },
   },
 };
